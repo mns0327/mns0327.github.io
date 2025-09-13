@@ -2,25 +2,25 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/rm/</loc>
+    <loc>https://mns0327.github.io/rm/</loc>
     <lastmod>2025-09-11T20:19:41+09:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/rm/posts/</loc>
+    <loc>https://mns0327.github.io/rm/posts/</loc>
     <lastmod>2025-09-11T20:19:41+09:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/rm/posts/compiler-lifetime/</loc>
+    <loc>https://mns0327.github.io/rm/posts/compiler-lifetime/</loc>
     <lastmod>2025-09-11T20:19:41+09:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/rm/archives.fr/</loc>
+    <loc>https://mns0327.github.io/rm/archives.fr/</loc>
   </url><url>
-    <loc>http://localhost:1313/rm/archives/</loc>
+    <loc>https://mns0327.github.io/rm/archives/</loc>
   </url><url>
-    <loc>http://localhost:1313/rm/categories/</loc>
+    <loc>https://mns0327.github.io/rm/categories/</loc>
   </url><url>
-    <loc>http://localhost:1313/rm/search/</loc>
+    <loc>https://mns0327.github.io/rm/search/</loc>
   </url><url>
-    <loc>http://localhost:1313/rm/search.fr/</loc>
+    <loc>https://mns0327.github.io/rm/search.fr/</loc>
   </url><url>
-    <loc>http://localhost:1313/rm/tags/</loc>
+    <loc>https://mns0327.github.io/rm/tags/</loc>
   </url>
 </urlset>
