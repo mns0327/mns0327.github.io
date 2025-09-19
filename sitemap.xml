@@ -2,11 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://mns0327.github.io/posts/allocate/</loc>
+    <lastmod>2025-09-18T15:13:16+09:00</lastmod>
+  </url><url>
     <loc>https://mns0327.github.io/</loc>
-    <lastmod>2025-09-11T20:19:41+09:00</lastmod>
+    <lastmod>2025-09-18T15:13:16+09:00</lastmod>
   </url><url>
     <loc>https://mns0327.github.io/posts/</loc>
-    <lastmod>2025-09-11T20:19:41+09:00</lastmod>
+    <lastmod>2025-09-18T15:13:16+09:00</lastmod>
   </url><url>
     <loc>https://mns0327.github.io/posts/compiler-lifetime/</loc>
     <lastmod>2025-09-11T20:19:41+09:00</lastmod>

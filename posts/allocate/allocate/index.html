@@ -1,0 +1,101 @@
+<!doctype html><html lang=en dir=auto><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Allocate | Mns03's Blog</title><meta name=keywords content><meta name=description content='In this page, I&rsquo;ll dive into how Box, Vec types allocating works and global allocator,
+Box, Vec memory allocation
+Box
+Box is the simplest smart pointer in rust. It allocates a value on the heap and ensures ownership is clear and safe.
+Under the hood, however, Box is defined with more complexity than the Box<T> we useally write.
+Here&rsquo;s the actual definition:
+
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+
+
+#[lang = "owned_box"]
+#[fundamental]
+#[stable(feature = "rust1", since = "1.0.0")]
+#[rustc_insignificant_dtor]
+#[doc(search_unbox)]
+// The declaration of the `Box` struct must be kept in sync with the
+// compiler or ICEs will happen.
+pub struct Box<
+    T: ?Sized,
+    #[unstable(feature = "allocator_api", issue = "32838")] A: Allocator = Global,
+>(Unique<T>, A);
+
+
+Box has two fields:'><meta name=author content="Mns0327"><link rel=canonical href=http://localhost:1313/posts/allocate/allocate/><meta name=google-site-verification content="YLRoBfc881pNgRbB11A5m32ewtm2wFoHpfnyn_RIWPw"><meta name=yandex-verification content="642ce36658394f0e"><meta name=msvalidate.01 content="786DC2C126C805820A42007E0DAEA3D5"><link crossorigin=anonymous href=/assets/css/stylesheet.8f94d29946fa3ab558c16f36bd95b172152bdb44d7102917f2f53571e2d44bdc.css integrity="sha256-j5TSmUb6OrVYwW82vZWxchUr20TXECkX8vU1ceLUS9w=" rel="preload stylesheet" as=style><link rel=icon href=http://localhost:1313/icon/favicon.ico><link rel=icon type=image/png sizes=16x16 href=http://localhost:1313/icon/favicon16x16.png><link rel=icon type=image/png sizes=32x32 href=http://localhost:1313/icon/favicon32x32.png><link rel=apple-touch-icon href=http://localhost:1313/apple-touch-icon.png><link rel=mask-icon href=http://localhost:1313/icon/safari-pinned-tab.png><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=http://localhost:1313/posts/allocate/allocate/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><script async src="https://www.googletagmanager.com/gtag/js?id=G-C5PDQZQGM4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-C5PDQZQGM4")}</script><meta property="og:url" content="http://localhost:1313/posts/allocate/allocate/"><meta property="og:site_name" content="Mns03's Blog"><meta property="og:title" content="Allocate"><meta property="og:description" content='In this page, I’ll dive into how Box, Vec types allocating works and global allocator,
+Box, Vec memory allocation Box Box is the simplest smart pointer in rust. It allocates a value on the heap and ensures ownership is clear and safe.
+Under the hood, however, Box is defined with more complexity than the Box<T> we useally write. Here’s the actual definition:
+1 2 3 4 5 6 7 8 9 10 11 #[lang = "owned_box"] #[fundamental] #[stable(feature = "rust1", since = "1.0.0")] #[rustc_insignificant_dtor] #[doc(search_unbox)] // The declaration of the `Box` struct must be kept in sync with the // compiler or ICEs will happen. pub struct Box< T: ?Sized, #[unstable(feature = "allocator_api", issue = "32838")] A: Allocator = Global, >(Unique<T>, A); Box has two fields:'><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-09-18T15:13:16+09:00"><meta property="article:modified_time" content="2025-09-18T15:13:16+09:00"><meta property="og:image" content="http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:title content="Allocate"><meta name=twitter:description content='In this page, I&rsquo;ll dive into how Box, Vec types allocating works and global allocator,
+Box, Vec memory allocation
+Box
+Box is the simplest smart pointer in rust. It allocates a value on the heap and ensures ownership is clear and safe.
+Under the hood, however, Box is defined with more complexity than the Box<T> we useally write.
+Here&rsquo;s the actual definition:
+
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+
+
+#[lang = "owned_box"]
+#[fundamental]
+#[stable(feature = "rust1", since = "1.0.0")]
+#[rustc_insignificant_dtor]
+#[doc(search_unbox)]
+// The declaration of the `Box` struct must be kept in sync with the
+// compiler or ICEs will happen.
+pub struct Box<
+    T: ?Sized,
+    #[unstable(feature = "allocator_api", issue = "32838")] A: Allocator = Global,
+>(Unique<T>, A);
+
+
+Box has two fields:'><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"http://localhost:1313/posts/"},{"@type":"ListItem","position":2,"name":"Allocate","item":"http://localhost:1313/posts/allocate/allocate/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Allocate","name":"Allocate","description":"In this page, I\u0026rsquo;ll dive into how Box, Vec types allocating works and global allocator,\nBox, Vec memory allocation Box Box is the simplest smart pointer in rust. It allocates a value on the heap and ensures ownership is clear and safe.\nUnder the hood, however, Box is defined with more complexity than the Box\u0026lt;T\u0026gt; we useally write. Here\u0026rsquo;s the actual definition:\n1 2 3 4 5 6 7 8 9 10 11 #[lang = \u0026#34;owned_box\u0026#34;] #[fundamental] #[stable(feature = \u0026#34;rust1\u0026#34;, since = \u0026#34;1.0.0\u0026#34;)] #[rustc_insignificant_dtor] #[doc(search_unbox)] // The declaration of the `Box` struct must be kept in sync with the // compiler or ICEs will happen. pub struct Box\u0026lt; T: ?Sized, #[unstable(feature = \u0026#34;allocator_api\u0026#34;, issue = \u0026#34;32838\u0026#34;)] A: Allocator = Global, \u0026gt;(Unique\u0026lt;T\u0026gt;, A); Box has two fields:\n","keywords":[],"articleBody":"In this page, I’ll dive into how Box, Vec types allocating works and global allocator,\nBox, Vec memory allocation Box Box is the simplest smart pointer in rust. It allocates a value on the heap and ensures ownership is clear and safe.\nUnder the hood, however, Box is defined with more complexity than the Box we useally write. Here’s the actual definition:\n1 2 3 4 5 6 7 8 9 10 11 #[lang = \"owned_box\"] #[fundamental] #[stable(feature = \"rust1\", since = \"1.0.0\")] #[rustc_insignificant_dtor] #[doc(search_unbox)] // The declaration of the `Box` struct must be kept in sync with the // compiler or ICEs will happen. pub struct Box\u003c T: ?Sized, #[unstable(feature = \"allocator_api\", issue = \"32838\")] A: Allocator = Global, \u003e(Unique\u003cT\u003e, A); Box has two fields:\nUnique T: ?Sized: The type parameter T may be a dynamically sized type (DST).\nThis bound allows Box to hold values like Box or Box\u003c[u8]\u003e, not only sized types. Unique: A wrapper around a raw non-null pointer that guarantees uniqueness.\nThis ensures that the Box owns its allocation exclusively, preventing aliasing of the pointer. A A: Allocator = Global: The type parameter A represents the allocator used to allocate and deallocate memory for the Box. By default, it is set to Global, which means the global system allocator will be used. This does not introduce any runtime overhead because Global is zero size type (ZST) Vec Global Allocator \u0026 Low level Allocate function New Allocator trait Flow the Allocating with binary jemalloc / mimalloc 등 다른 할당자 Loo Rust의 메모리 할당은 기본적으로 안전하지만, unsafe와 결합되면 C만큼 자유롭다\n","wordCount":"264","inLanguage":"en","image":"http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E","datePublished":"2025-09-18T15:13:16+09:00","dateModified":"2025-09-18T15:13:16+09:00","author":{"@type":"Person","name":"Mns0327"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:1313/posts/allocate/allocate/"},"publisher":{"@type":"Organization","name":"Mns03's Blog","logo":{"@type":"ImageObject","url":"http://localhost:1313/icon/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=http://localhost:1313/ accesskey=h title="Mns03 (Alt + H)"><img src=http://localhost:1313/icon/moon.png alt aria-label=logo height=35>Mns03</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=http://localhost:1313/archives title=Archive><span>Archive</span></a></li><li><a href=http://localhost:1313/search/ title="Search (Alt + /)" accesskey=/><span>Search</span></a></li><li><a href=http://localhost:1313/tags/ title=Tags><span>Tags</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=http://localhost:1313/>Home</a>&nbsp;»&nbsp;<a href=http://localhost:1313/posts/>Posts</a></div><h1 class="post-title entry-hint-parent">Allocate</h1><div class=post-meta><span title='2025-09-18 15:13:16 +0900 KST'>September 18, 2025</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;264 words&nbsp;·&nbsp;Mns0327</div></header><div class=post-content><p>In this page, I&rsquo;ll dive into how <code>Box</code>, <code>Vec</code> types allocating works and global allocator,</p><h2 id=box-vec-memory-allocation>Box, Vec memory allocation<a hidden class=anchor aria-hidden=true href=#box-vec-memory-allocation>#</a></h2><h3 id=box>Box<a hidden class=anchor aria-hidden=true href=#box>#</a></h3><p><code>Box</code> is the simplest smart pointer in rust. It allocates a value on the heap and ensures ownership is clear and safe.</p><p>Under the hood, however, <code>Box</code> is defined with more complexity than the <code>Box&lt;T></code> we useally write.
+Here&rsquo;s the actual definition:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-rust data-lang=rust><span class=line><span class=cl><span class=cp>#[lang = </span><span class=s>&#34;owned_box&#34;</span><span class=cp>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=cp>#[fundamental]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=cp>#[stable(feature = </span><span class=s>&#34;rust1&#34;</span><span class=cp>, since = </span><span class=s>&#34;1.0.0&#34;</span><span class=cp>)]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=cp>#[rustc_insignificant_dtor]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=cp>#[doc(search_unbox)]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>// The declaration of the `Box` struct must be kept in sync with the
+</span></span></span><span class=line><span class=cl><span class=c1>// compiler or ICEs will happen.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>pub</span><span class=w> </span><span class=k>struct</span> <span class=nb>Box</span><span class=o>&lt;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>T</span>: <span class=o>?</span><span class=nb>Sized</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=cp>#[unstable(feature = </span><span class=s>&#34;allocator_api&#34;</span><span class=cp>, issue = </span><span class=s>&#34;32838&#34;</span><span class=cp>)]</span><span class=w> </span><span class=n>A</span>: <span class=nc>Allocator</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>Global</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=o>&gt;</span><span class=p>(</span><span class=n>Unique</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=p>,</span><span class=w> </span><span class=n>A</span><span class=p>);</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>Box has two fields:</p><h4 id=uniquet><code>Unique&lt;T></code><a hidden class=anchor aria-hidden=true href=#uniquet>#</a></h4><ul><li><code>T: ?Sized</code>: The type parameter <code>T</code> may be a dynamically sized type (DST).<br>This bound allows <code>Box</code> to hold values like <code>Box&lt;dyn Trait></code> or <code>Box&lt;[u8]></code>, not only sized types.</li><li><code>Unique&lt;T></code>: A wrapper around a raw non-null pointer that guarantees uniqueness.<br>This ensures that the <code>Box</code> owns its allocation exclusively, preventing aliasing of the pointer.</li></ul><h4 id=a><code>A</code><a hidden class=anchor aria-hidden=true href=#a>#</a></h4><ul><li><code>A: Allocator = Global</code>: The type parameter <code>A</code> represents the allocator used to allocate and deallocate memory for the <code>Box</code>.</li><li>By default, it is set to <code>Global</code>, which means the global system allocator will be used. This does not introduce any runtime overhead because <code>Global</code> is zero size type (ZST)</li></ul><h3 id=vec>Vec<a hidden class=anchor aria-hidden=true href=#vec>#</a></h3><h2 id=global-allocator--low-level-allocate-function>Global Allocator & Low level Allocate function<a hidden class=anchor aria-hidden=true href=#global-allocator--low-level-allocate-function>#</a></h2><h2 id=new-allocator-trait>New Allocator trait<a hidden class=anchor aria-hidden=true href=#new-allocator-trait>#</a></h2><h2 id=flow-the-allocating-with-binary>Flow the Allocating with binary<a hidden class=anchor aria-hidden=true href=#flow-the-allocating-with-binary>#</a></h2><h2 id=jemalloc--mimalloc-등-다른-할당자>jemalloc / mimalloc 등 다른 할당자<a hidden class=anchor aria-hidden=true href=#jemalloc--mimalloc-등-다른-할당자>#</a></h2><h2 id=loo>Loo<a hidden class=anchor aria-hidden=true href=#loo>#</a></h2><p>Rust의 메모리 할당은 기본적으로 안전하지만, unsafe와 결합되면 C만큼 자유롭다</p></div><footer class=post-footer><ul class=post-tags></ul><nav class=paginav><a class=next href=http://localhost:1313/posts/compiler-lifetime/><span class=title>Next »</span><br><span>Rust: How the Compiler Manages Lifetimes</span></a></nav></footer></article></main><footer class=footer><span>&copy; 2025 <a href=http://localhost:1313/>Mns03's Blog</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>
