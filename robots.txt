@@ -1,3 +1,1 @@
 User-agent: *
-Disallow:
-Sitemap: https://mns0327.github.io/sitemap.xml
