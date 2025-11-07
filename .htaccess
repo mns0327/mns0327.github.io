@@ -1,0 +1,4 @@
+<Files "sitemap.xml">
+  ForceType text/xml
+  Header set Content-Type "text/xml"
+</Files>
